@@ -3,7 +3,7 @@ import base64
 from hashlib import sha256
 
 # 请求用户输入十六进制流
-hex_stream = input("Enter Hex Stream: ")
+hex_stream = input("Enter MAVLink Hex Stream: ")
 
 # 将十六进制流转换为字节流
 byte_stream = bytes.fromhex(hex_stream)
