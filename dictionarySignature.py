@@ -1,43 +1,50 @@
-import datetime
 import hashlib
-import sys
-import argparse
-import time
-import binascii
 import base64
 from hashlib import sha256
 
-def extract_fields(hex_stream):
-    # Convert the hex stream to bytes
-    bytes_data = bytes.fromhex(hex_stream)
-    
-    # Extract fields
-    header = bytes_data[:10]
-    signature = bytes_data[-6:]
-    timestamp = bytes_data[-12:-6]
-    linkid = bytes_data[-13]
-    crc = bytes_data[-15:-13]
-    payload = bytes_data[10:-15]
+# 请求用户输入十六进制流
+hex_stream = input("Enter Hex Stream: ")
 
-    return header, signature, timestamp, linkid, crc, payload
+# 将十六进制流转换为字节流
+byte_stream = bytes.fromhex(hex_stream)
+
+# 提取字段
+header = byte_stream[:10]  # 前10个字节为header
+signature = byte_stream[-6:]  # 最后6个字节为signature
+timestamp = byte_stream[-12:-6]  # signature前面的6个字节为timestamp
+linkid = byte_stream[-13]  # timestamp的前一个字节为linkid
+crc = byte_stream[-15:-13]  # linkid的前两个字节为crc
+payload = byte_stream[10:-15]  # 剩余的是payload
+
+# 将提取的字段转换为十六进制字符串
+header = header.hex()
+payload = payload.hex()
+crc = crc.hex()
+linkid = linkid.to_bytes(1, 'big').hex()
+timestamp = timestamp.hex()
+
+# 打印提取的字段（可选，用于验证）
+print("Header: ", header)
+print("Signature: ", signature.hex())
+print("Timestamp: ", timestamp)
+print("Link ID: ", linkid)
+print("CRC: ", crc)
+print("Payload: ", payload)
 
 def calculate_secretkey(seed):
     print("Seed: ", seed)
-    hashed_seed = (sha256(seed.encode('utf-8')).hexdigest())
+    hashed_seed = sha256(seed.encode('utf-8')).hexdigest()
     print("SHA256: ", hashed_seed)
     hex_seed = bytes.fromhex(hashed_seed)
-    print("")
-    print("From HEX: ", hex_seed)
     base64_bytes = base64.b64encode(hex_seed)
     base64_seed = base64_bytes.decode('ascii')
     print("To base64 (KEY): ", base64_seed)
     print("Signature = sha256_48(secret_key + header + payload + CRC + Link ID + timestamp)")
 
 def calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp):
-    signaturecompleta = hashed_seed + header.hex() + payload.hex() + crc.hex() + linkid.to_bytes(1, 'big').hex() + timestamp.hex()
-    signature = sha256(bytes.fromhex(signaturecompleta))
-    stampa_signature = signature.hexdigest()
-    signature48bit = stampa_signature[:12]
+    signaturecompleta = hashed_seed + header + payload + crc + linkid + timestamp
+    signature = sha256(bytes.fromhex(signaturecompleta)).hexdigest()
+    signature48bit = signature[:12]
     return signature48bit
 
 class bcolors:
@@ -50,36 +57,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def crack_hash(hash_type, hash_string, header, payload, crc, linkid, timestamp, extracted_signature):
-    hashed_seed = ""
-    found = False  # Flag to track if a match is found
-    if hash_type in supported_types:
-        with open(wordlist, 'r') as wl:
-            guesses = wl.read().split('\n')
-            for guess in guesses:
-                hashed_seed = (sha256(guess.encode('utf-8')).hexdigest())
-                hashed_guess = calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp)
-                print(hashed_guess)
-                if hashed_guess == hash_string:
-                    print(bcolors.OKGREEN + "\nFOUND:\n" + bcolors.ENDC)
-                    print(hash_string + ":" + bcolors.BOLD + bcolors.OKGREEN + guess + bcolors.ENDC)
-                    cracked.append(hash_string + ":" + guess)
-                    found = True
-                    break
-                elif hashed_guess == extracted_signature.hex():
-                    print(bcolors.OKGREEN + "\nMATCHING SIGNATURE FOUND:\n" + bcolors.ENDC)
-                    print(bcolors.BOLD + bcolors.OKGREEN + hashed_guess + bcolors.ENDC)
-                    cracked.append("Extracted Signature Match: " + hashed_guess)
-                    found = True
-            if not found:
-                print(bcolors.FAIL + "Signature not found" + bcolors.ENDC)
-            print("End of the list.")
-    else:
-        print("Hash type \"" + hash_type + "\" is not supported.")
-        print("")
-        print("Supported types:")
-        for hashtype in supported_types:
-            print("  " + hashtype)
+import argparse
 
 parser = argparse.ArgumentParser(description='SHRACK: The hash cracker')
 parser.add_argument('--type', help='Hash type', required=False)
@@ -119,20 +97,45 @@ if len(hashes) == 0:
 supported_types = ('md5', 'sha256', 'sha1', 'sha224', 'sha384')
 wordlist = args.wordlist
 
-# Main program
-hex_stream = input("请输入一段hex流: ")
-header, signature, timestamp, linkid, crc, payload = extract_fields(hex_stream)
+def encrypt(hash_type, hash_string):
+    if hash_type == "md5":
+        return (hashlib.md5(hash_string.encode()).hexdigest())
+    if hash_type == "sha256":
+        return (hashlib.sha256(hash_string.encode()).hexdigest())
+    if hash_type == "sha1":
+        return (hashlib.sha1(hash_string.encode()).hexdigest())
+    if hash_type == "sha224":
+        return (hashlib.sha224(hash_string.encode()).hexdigest())
+    if hash_type == "sha384":
+        return (hashlib.sha384(hash_string.encode()).hexdigest())
 
-# Use extracted values for further processing
-print(f"Extracted Header: {header.hex()}")
-print(f"Extracted Signature: {signature.hex()}")
-print(f"Extracted Timestamp: {timestamp.hex()}")
-print(f"Extracted LinkID: {linkid:02x}")
-print(f"Extracted CRC: {crc.hex()}")
-print(f"Extracted Payload: {payload.hex()}")
+def crack_hash(hash_type, hash_string):
+    hashed_seed = ""
+    if hash_type in supported_types:
+        with open(wordlist, 'r') as wl:
+            guesses = wl.read().split('\n')
+            for guess in guesses:
+                hashed_seed = sha256(guess.encode('utf-8')).hexdigest()
+                hashed_guess = calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp)
+                print(hashed_guess)
+                if hashed_guess == hash_string:
+                    print(bcolors.OKGREEN + "\nFOUND:\n" + bcolors.ENDC)
+                    print(hash_string + ":" + bcolors.BOLD + bcolors.OKGREEN + guess + bcolors.ENDC)
+                    cracked.append(hash_string + ":" + guess)
+                    break
+                else:
+                    if args.v:
+                        print(bcolors.FAIL + "Fail \"" + guess + "\"" + bcolors.ENDC + " (" + str(guesses.index(guess) + 1) + "/" + str(guesses.__len__()) + ")")
+            print("End of the list.")
+    else:
+        print("hash type \"" + hash_type + "\" is not supported.")
+        print("")
+        print("Supported types:")
+        for hashtype in supported_types:
+            print("  " + hashtype)
 
 for hashstr in hashes:
-    crack_hash(hashstr.split(':')[1], hashstr.split(":")[0].lower(), header, payload, crc, linkid, timestamp, signature)
+    crack_hash(hashstr.split(':')[1], hashstr.split(":")[0].lower())
 
 if len(cracked) != 0:
     print(bcolors.OKGREEN + "\nRESULT:\n" + bcolors.ENDC)
