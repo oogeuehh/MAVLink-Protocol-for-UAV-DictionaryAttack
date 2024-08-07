@@ -52,6 +52,7 @@ class bcolors:
 
 def crack_hash(hash_type, hash_string, header, payload, crc, linkid, timestamp, extracted_signature):
     hashed_seed = ""
+    found = False  # Flag to track if a match is found
     if hash_type in supported_types:
         with open(wordlist, 'r') as wl:
             guesses = wl.read().split('\n')
@@ -63,11 +64,15 @@ def crack_hash(hash_type, hash_string, header, payload, crc, linkid, timestamp, 
                     print(bcolors.OKGREEN + "\nFOUND:\n" + bcolors.ENDC)
                     print(hash_string + ":" + bcolors.BOLD + bcolors.OKGREEN + guess + bcolors.ENDC)
                     cracked.append(hash_string + ":" + guess)
+                    found = True
                     break
                 elif hashed_guess == extracted_signature.hex():
                     print(bcolors.OKGREEN + "\nMATCHING SIGNATURE FOUND:\n" + bcolors.ENDC)
                     print(bcolors.BOLD + bcolors.OKGREEN + hashed_guess + bcolors.ENDC)
                     cracked.append("Extracted Signature Match: " + hashed_guess)
+                    found = True
+            if not found:
+                print(bcolors.FAIL + "Signature not found" + bcolors.ENDC)
             print("End of the list.")
     else:
         print("Hash type \"" + hash_type + "\" is not supported.")
