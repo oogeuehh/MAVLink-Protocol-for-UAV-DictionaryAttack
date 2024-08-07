@@ -1,5 +1,5 @@
-# MAVLink-Protocol-for-UAV
-Additional materials for "MAVLink Protocol for Unmanned Aerial Vehicle:  Vulnerabilities Analysis"
+# MAVLink-Protocol-for-UAV-DitionaryAttack
+A extension for program (URL:https://github.com/VSecLab/MAVLink-Protocol-for-UAV), which hold a automically extract and analyse for transmitted message and following dictionary attack.
 
 # ScriptCyberChef
 
@@ -24,10 +24,6 @@ time python3 dictionarySignature.py --type sha256 --string "signature" --wordlis
 # wordlist
 
 Wordlist used to carry out the attack.  It contains about 100,000 words including the most used passwords in the world, the most common Italian names and surnames, and finally many terms from the Italian dictionary.
-
-# file.mp4 and .mov
-
-Videos are shown to show the execution of the dictionary attack on the Key, the Signature and finally the actual Injection.
 
 # Software Requirements 
 
