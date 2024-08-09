@@ -1,50 +1,36 @@
+import datetime
 import hashlib
+import sys
+import argparse
+import time
+import binascii
 import base64
 from hashlib import sha256
 
-# 请求用户输入十六进制流
-hex_stream = input("Enter MAVLink Hex Stream: ")
-
-# 将十六进制流转换为字节流
-byte_stream = bytes.fromhex(hex_stream)
-
-# 提取字段
-header = byte_stream[:10]  # 前10个字节为header
-signature = byte_stream[-6:]  # 最后6个字节为signature
-timestamp = byte_stream[-12:-6]  # signature前面的6个字节为timestamp
-linkid = byte_stream[-13]  # timestamp的前一个字节为linkid
-crc = byte_stream[-15:-13]  # linkid的前两个字节为crc
-payload = byte_stream[10:-15]  # 剩余的是payload
-
-# 将提取的字段转换为十六进制字符串
-header = header.hex()
-payload = payload.hex()
-crc = crc.hex()
-linkid = linkid.to_bytes(1, 'big').hex()
-timestamp = timestamp.hex()
-
-# 打印提取的字段（可选，用于验证）
-print("Header: ", header)
-print("Signature: ", signature.hex())
-print("Timestamp: ", timestamp)
-print("Link ID: ", linkid)
-print("CRC: ", crc)
-print("Payload: ", payload)
+header = input("Enter Header: ")
+payload = input("Enter Payload: ")
+crc = input("Enter CRC: ")
+linkid = input("Enter Link ID: ")
+timestamp = input("Enter Timestamp: ")
 
 def calculate_secretkey(seed):
     print("Seed: ", seed)
-    hashed_seed = sha256(seed.encode('utf-8')).hexdigest()
+    hashed_seed = (sha256(seed.encode('utf-8')).hexdigest())
     print("SHA256: ", hashed_seed)
     hex_seed = bytes.fromhex(hashed_seed)
+    print("")
+    print("From HEX: ", hex_seed)
     base64_bytes = base64.b64encode(hex_seed)
     base64_seed = base64_bytes.decode('ascii')
     print("To base64 (KEY): ", base64_seed)
     print("Signature = sha256_48(secret_key + header + payload + CRC + Link ID + timestamp)")
 
 def calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp):
-    signaturecompleta = hashed_seed + header + payload + crc + linkid + timestamp
-    signature = sha256(bytes.fromhex(signaturecompleta)).hexdigest()
-    signature48bit = signature[:12]
+    #hashed_seed = (sha256(seed.encode('utf-8')).hexdigest())
+    signaturecompleta = hashed_seed+header+payload+crc+linkid+timestamp
+    signature = sha256(bytes.fromhex(signaturecompleta))
+    stampa_signature = signature.hexdigest()
+    signature48bit = stampa_signature[:12]
     return signature48bit
 
 class bcolors:
@@ -57,14 +43,12 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-import argparse
-
 parser = argparse.ArgumentParser(description='SHRACK: The hash cracker')
 parser.add_argument('--type', help='Hash type', required=False)
 parser.add_argument('--string', help='Hash string', required=False)
 parser.add_argument('--hashes', help='Hashes file', required=False)
 parser.add_argument('--wordlist', help='Wordlist', required=False)
-parser.add_argument('--v', help="(true/false) Show more information while cracking", default=False, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument('--v',help="(true/false) Show more information while cracking", default=False, type=lambda x: (str(x).lower() == 'true'))
 args = parser.parse_args()
 
 hashes = []
@@ -96,7 +80,6 @@ if len(hashes) == 0:
 
 supported_types = ('md5', 'sha256', 'sha1', 'sha224', 'sha384')
 wordlist = args.wordlist
-
 def encrypt(hash_type, hash_string):
     if hash_type == "md5":
         return (hashlib.md5(hash_string.encode()).hexdigest())
@@ -115,13 +98,15 @@ def crack_hash(hash_type, hash_string):
         with open(wordlist, 'r') as wl:
             guesses = wl.read().split('\n')
             for guess in guesses:
-                hashed_seed = sha256(guess.encode('utf-8')).hexdigest()
+                #hashed_guess = encrypt(hash_type, guess).lower()
+                hashed_seed = (sha256(guess.encode('utf-8')).hexdigest())
                 hashed_guess = calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp)
                 print(hashed_guess)
                 if hashed_guess == hash_string:
                     print(bcolors.OKGREEN + "\nFOUND:\n" + bcolors.ENDC)
                     print(hash_string + ":" + bcolors.BOLD + bcolors.OKGREEN + guess + bcolors.ENDC)
                     cracked.append(hash_string + ":" + guess)
+                    #calculate_secretkey(guess)
                     break
                 else:
                     if args.v:
