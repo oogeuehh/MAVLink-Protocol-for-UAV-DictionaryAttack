@@ -1,13 +1,14 @@
 # MAVLink-Protocol-for-UAV-DitionaryAttack
-A extension for program (URL:https://github.com/VSecLab/MAVLink-Protocol-for-UAV), which hold a automically extract and analyse for transmitted message and following dictionary attack.
 
-# ScriptCyberChef
+A extension for program (URL: https://github.com/VSecLab/MAVLink-Protocol-for-UAV), which hold a automically extract and analyse for transmitted message and following injection attack.
 
-Script that replicates the operations performed on CyberChef for the encrypting of the initial seed used to sign MAVLink messages.
+# wireshark mavlink plugins
 
-# getSignature
+For extract the mavlink packet using wireshark, you need to access the wensite (URL: https://mavlink.io/en/guide/wireshark.html), and follow the guidlines.
 
-Script that allows you to create and replicate a valid signature for MAVLink messages, starting from an initial seed and entering all the information necessary for the creation of the signature: Signature = sha256_48 (secret_key + header + payload + CRC + Link ID + timestamp).
+# wkReading
+
+Script that allow you to extract the mavlink fields automatically.
 
 # dictionaryKey and dictionarySignature
 
@@ -29,4 +30,5 @@ Wordlist used to carry out the attack.  It contains about 100,000 words includin
 
 - Python 3
 - Mission Planner
-- Packet Sender
+- Ardupilot
+- WireShark
