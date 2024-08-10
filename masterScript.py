@@ -16,12 +16,12 @@ def read_hex(filepath):
     return hex_stream
 
 def run_wkReading(hex_stream):
-  result = subprocess.run(["python3", "wkReading.py"], capture_output=True, text=True)
+  result = subprocess.run(["python3", "wkReading.py", hex_stream], capture_output=True, text=True)
   
   output = result.stdout.strip().split('\n')
   
   if len(output)!=6:
-    raise ValueError("fields number is wrong")
+    raise ValueError("mavlink fields number is wrong")
     
   header = output[0].split(":")[1].strip()
   payload = output[1].split(":")[1].strip()
@@ -34,15 +34,13 @@ def run_wkReading(hex_stream):
   print("extract finished")
 
 def analyze_signature(header, payload, crc, linkid, timestamp, signature):
-  command = [
+  subprocess.run([
     "python3", "dictionarySignature.py",
     "--type", "sha256",
     "--string", signature,
-    "--wordlist", "wordlist.txt"
-  ]
-  print("running file")
-  process = subprocess.run(command)
-  print("analyze finished")
+    "--wordlist", "wordlist.txt",
+      header, payload, crc, linkid, timestamp
+  ], check=True)
 
 def main():
   filepath = '/home/doophie/python/mavlink_hex_stream.txt'
@@ -53,6 +51,7 @@ def main():
   header, payload, crc, linkid, timestamp, signature = run_wkReading(hex_stream)
   
   analyze_signature(header, payload, crc, linkid, timestamp, signature)
+    
   print("all finished")
 
 if __name__ == "__main__":
