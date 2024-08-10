@@ -34,13 +34,20 @@ def run_wkReading(hex_stream):
   print("extract finished")
 
 def analyze_signature(header, payload, crc, linkid, timestamp, signature):
-  subprocess.run([
+  command = [
     "python3", "dictionarySignature.py",
     "--type", "sha256",
     "--string", signature,
     "--wordlist", "wordlist.txt",
       header, payload, crc, linkid, timestamp
-  ], check=True)
+  ]
+  
+  result = subprocess.run(command, capture_output=True, text=True)
+  
+  if result.stdout:
+    return result.stdout.strip()
+  else:
+    return result.stdout.strip() if result.stderr else "No output received"
 
 def main():
   filepath = '/home/doophie/MAVLink-Protocol-for-UAV-DictionaryAttack/mavlink_hex_stream.txt'
