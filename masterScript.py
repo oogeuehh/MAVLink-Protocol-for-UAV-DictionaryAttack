@@ -39,7 +39,7 @@ def analyze_signature(header, payload, crc, linkid, timestamp, signature):
     "--type", "sha256",
     "--string", signature,
     "--wordlist", "wordlist.txt",
-    "--header", header
+    "--header", header,
     "--payload", payload,
     "--crc", crc, 
     "--linkid", linkid,
@@ -67,4 +67,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-  
