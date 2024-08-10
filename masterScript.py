@@ -43,7 +43,7 @@ def analyze_signature(header, payload, crc, linkid, timestamp, signature):
   ], check=True)
 
 def main():
-  filepath = '/home/doophie/python/mavlink_hex_stream.txt'
+  filepath = '/home/doophie/MAVLink-Protocol-for-UAV-DictionaryAttack/mavlink_hex_stream.txt'
   wait_for_file(filepath)
   
   hex_stream = read_hex(filepath)
