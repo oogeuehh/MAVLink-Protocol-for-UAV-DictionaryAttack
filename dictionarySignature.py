@@ -28,7 +28,7 @@ def crack_hash(hash_type, hash_string, header, payload, crc, linkid, timestamp, 
         print("Supported types:")
         for hashtype in supported_types:
             print("  " + hashtype)
-        return
+        return "Unsupported hash type"
     
     cracked = []
     with open(wordlist, 'r') as wl:
@@ -36,18 +36,16 @@ def crack_hash(hash_type, hash_string, header, payload, crc, linkid, timestamp, 
         for guess in guesses:
             hashed_seed = (sha256(guess.encode('utf-8')).hexdigest())
             hashed_guess = calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp)
-            print(hashed_guess)
             if hashed_guess == hash_string:
-                print("FOUND:")
-                print(f"{hash_string}: {guess}")
-                cracked.append(f"{hash_string}: {guess}")
+                result = f"FOUND:\n{hash_string}: {guess}"
+                print(result)
+                cracked.append(result)
                 break
             elif verbose:
                 print(f"Fail \"{guess}\" ({guesses.index(guess) + 1}/{len(guesses)})")
         print("End of the list.")
     
     if cracked:
-        print("\nRESULT:")
-        for crackedhash in cracked:
-            print(crackedhash)
-            print("")
+        return "\nRESULT:\n" + "\n".join(cracked)
+    else:
+        return "No match found"
