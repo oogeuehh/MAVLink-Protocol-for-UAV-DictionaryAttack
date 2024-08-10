@@ -24,7 +24,7 @@ time python3 dictionarySignature.py --type sha256 --string "signature" --wordlis
 
 # masterScript
 
-Scripts that allow you run all the required code in series without manual input the content.
+Scripts that allow you run all the required code in series without manually input the content.
 
 # wordlist
 
