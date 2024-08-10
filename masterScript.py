@@ -50,9 +50,9 @@ def main():
   
   header, payload, crc, linkid, timestamp, signature = run_wkReading(hex_stream)
   
-  analyze_signature(header, payload, crc, linkid, timestamp, signature)
+  psw = analyze_signature(header, payload, crc, linkid, timestamp, signature)
     
-  print("all finished")
+  print(psw)
 
 if __name__ == "__main__":
   main()
