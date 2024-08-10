@@ -39,7 +39,11 @@ def analyze_signature(header, payload, crc, linkid, timestamp, signature):
     "--type", "sha256",
     "--string", signature,
     "--wordlist", "wordlist.txt",
-      header, payload, crc, linkid, timestamp
+    "--header", header
+    "--payload", payload,
+    "--crc", crc, 
+    "--linkid", linkid,
+    "--timestamp", timestamp
   ]
   
   result = subprocess.run(command, capture_output=True, text=True)
