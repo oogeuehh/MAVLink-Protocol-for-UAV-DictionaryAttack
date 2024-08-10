@@ -45,7 +45,7 @@ def analyze_signature(header, payload, crc, linkid, timestamp, signature):
   print("analyze finished")
 
 def main():
-  filepath = "mavlink_hex_stream.txt"
+  filepath = '/home/doophie/python/mavlink_hex_stream.txt'
   wait_for_file(filepath)
   
   hex_stream = read_hex(filepath)
