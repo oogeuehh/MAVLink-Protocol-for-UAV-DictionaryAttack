@@ -8,7 +8,7 @@ For extract the mavlink packet using wireshark, you need to access the wensite (
 
 # wkReading
 
-Script that allow you to extract the mavlink fields automatically.
+Scripts that allow you to extract the mavlink fields automatically.
 
 # dictionaryKey and dictionarySignature
 
@@ -21,6 +21,10 @@ time python3 dictionaryKey.py --type sha256 --string "secretkey" --wordlist word
 dictionarySignature:
 
 time python3 dictionarySignature.py --type sha256 --string "signature" --wordlist wordlist.txt
+
+# masterScript
+
+Scripts that allow you run all the required code in series.
 
 # wordlist
 
