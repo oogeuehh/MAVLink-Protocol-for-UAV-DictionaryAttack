@@ -22,11 +22,12 @@ def crack_hash(hash_type, hash_string, header, payload, crc, linkid, timestamp, 
     cracked = []
     with open(wordlist, 'r') as wl:
         guesses = wl.read().split('\n')
+        print("Starting to crack hash...")
         for guess in guesses:
-            hashed_seed = (sha256(guess.encode('utf-8')).hexdigest())
+            hashed_seed = sha256(guess.encode('utf-8')).hexdigest()
             hashed_guess = calculate_secretkey_input(hashed_seed, header, payload, crc, linkid, timestamp)
             if hashed_guess == hash_string:
-                print("\nFOUND:")
+                print("FOUND:")
                 print(f"{hash_string}: {guess}")
                 cracked.append(f"{hash_string}: {guess}")
                 break
