@@ -12,7 +12,7 @@ A plugin for extract the hex stream of the MAVLink Message (HeartBeat Message) a
 
 # wkReading
 
-Scripts that allow you to extract the mavlink fields automatically.
+Scripts that allow you to extract the mavlink fields automatically, including header, payload, linkid, crc, signature, and timestamp.
 
 # dictionaryKey and dictionarySignature
 
