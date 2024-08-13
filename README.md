@@ -4,7 +4,11 @@ A extension for program (URL: https://github.com/VSecLab/MAVLink-Protocol-for-UA
 
 # wireshark mavlink plugins
 
-To extract the mavlink packet using wireshark, you need to access the wensite (URL: https://mavlink.io/en/guide/wireshark.html), and follow the guidlines.
+To check and debug the MAVLink packet using wireshark, you need to access the wensite (URL: https://mavlink.io/en/guide/wireshark.html), and follow the guidlines.
+
+# capture_mavlink.lua
+
+A plugin for extract the hex stream of the MAVLink Message (HeartBeat Message) as a txt file.
 
 # wkReading
 
