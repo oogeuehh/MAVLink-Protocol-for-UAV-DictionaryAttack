@@ -15,7 +15,7 @@ def extract_fields(hex_stream):
     
 def main():     
     try:
-        with open("/home/doophie/python/mavlink_hex_stream.txt", "r") as file:
+        with open("mavlink_hex_stream.txt file path", "r") as file:
             hex_stream = file.readline().strip()
     
         header, signature, timestamp, linkid, crc, payload = extract_fields(hex_stream)
