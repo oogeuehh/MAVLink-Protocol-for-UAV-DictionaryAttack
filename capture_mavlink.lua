@@ -1,6 +1,6 @@
 local tap = Listener.new("frame", "udp.port == 14550")
 local captured = false
-local file = io.open("/home/doophie/MAVLink-Protocol-for-UAV-DictionaryAttack/mavlink_hex_stream.txt", "w")
+local file = io.open("mavlink_hex_stream.txt file path", "w")
 
 function tap.packet(pinfo, tvb)
 	if not captured then
