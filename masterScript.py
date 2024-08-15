@@ -54,7 +54,7 @@ def analyze_signature(header, payload, crc, linkid, timestamp, signature):
     return result.stdout.strip() if result.stderr else "No output received"
 
 def main():
-  filepath = '/home/wenjun/MAVLink-Protocol-for-UAV-DictionaryAttack/mavlink_hex_stream.txt'
+  filepath = 'mavlink_hex_stream.txt file path'
   wait_for_file(filepath)
   
   hex_stream = read_hex(filepath)
