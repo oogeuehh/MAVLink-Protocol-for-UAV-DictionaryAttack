@@ -24,11 +24,11 @@ def run_wkReading(hex_stream):
     raise ValueError("mavlink fields number is wrong")
     
   header = output[0].split(":")[1].strip()
-  payload = output[1].split(":")[1].strip()
-  crc = output[2].split(":")[1].strip()
+  signature = output[1].split(":")[1].strip()
+  timestamp = output[2].split(":")[1].strip()
   linkid = output[3].split(":")[1].strip()
-  timestamp = output[4].split(":")[1].strip()
-  signature = output[5].split(":")[1].strip()
+  crc = output[4].split(":")[1].strip()
+  payload = output[5].split(":")[1].strip()
   
   return header, payload, crc, linkid, timestamp, signature
   print("extract finished")
@@ -54,7 +54,7 @@ def analyze_signature(header, payload, crc, linkid, timestamp, signature):
     return result.stdout.strip() if result.stderr else "No output received"
 
 def main():
-  filepath = '/home/doophie/MAVLink-Protocol-for-UAV-DictionaryAttack/mavlink_hex_stream.txt'
+  filepath = '/home/wenjun/MAVLink-Protocol-for-UAV-DictionaryAttack/mavlink_hex_stream.txt'
   wait_for_file(filepath)
   
   hex_stream = read_hex(filepath)
