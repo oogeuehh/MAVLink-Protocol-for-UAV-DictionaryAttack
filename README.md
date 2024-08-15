@@ -24,7 +24,7 @@ time python3 dictionaryKey.py --type sha256 --string "secretkey" --wordlist word
 
 dictionarySignature:
 
-time python3 dictionarySignature.py --type sha256 --string "signature" --wordlist wordlist.txt
+time python3 dictionarySignature.py --type sha256 --string "signature" --wordlist wordlist.txt --header "header" --payload "payload" --crc "crc" --linkid "linkid" --timestamp "timestamp"
 
 # masterScript
 
