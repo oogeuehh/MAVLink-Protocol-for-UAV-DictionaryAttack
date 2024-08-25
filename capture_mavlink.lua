@@ -1,4 +1,4 @@
-local start_time = os.clock()
+
 local tap = Listener.new("frame", "udp.port == 14550")
 local captured = false
 local file = io.open("mavlink_hex_stream.txt file path", "w")
@@ -18,8 +18,6 @@ function tap.packet(pinfo, tvb)
 	end
 end
 
-local end_time = os.clock()
-print("capture time: ", end_time - start_time)
 function tap.reset()
 	file:close()
 end
