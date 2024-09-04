@@ -8,11 +8,15 @@ timestamp_format = "%Y-%m-%d %H:%M:%S.%f"
 # 将时间戳转换为 datetime 对象
 dt = datetime.strptime(timestamp_str, timestamp_format)
 
-# 转换为 Unix 时间戳（秒）
+# 将 datetime 对象转换为 Unix 时间戳（秒）
 unix_timestamp = int(dt.timestamp())
 
-# 转换为十六进制
-hex_stream = binascii.hexlify(unix_timestamp.to_bytes((unix_timestamp.bit_length() + 7) // 8, byteorder='big')).decode()
+# 将 Unix 时间戳转换为字节流
+# 在这里选择 8 字节来匹配你提供的十六进制字符串长度
+byte_stream = unix_timestamp.to_bytes(8, byteorder='big')
+
+# 将字节流转换为十六进制
+hex_stream = binascii.hexlify(byte_stream).decode()
 
 # 输出结果
-print(hex_stream)
+print(hex_stream)  # 结果将会是 29faf9e9c31b
