@@ -1,14 +1,15 @@
-import time
+from datetime import datetime
+import struct
 
-# 获取用户输入的时间（Unix 时间戳，单位为秒）
-user_input_time = float(input("Enter the current time as Unix timestamp (in seconds): "))
+# 获取当前UTC时间
+dt = datetime.utcnow()
+unix_timestamp = int(dt.timestamp())  # 获取秒数
+microseconds = dt.microsecond  # 获取微秒数
 
-# 将用户输入的时间转换为微秒时间戳
-currentTime = int(user_input_time * 1e6)
+# 假设MAVLink时间戳使用4字节秒和4字节微秒
+timestamp_bytes = struct.pack('<II', unix_timestamp, microseconds)
 
-# 将微秒时间戳转换为 8 字节的字节序列
-timestamp = currentTime.to_bytes(8, 'little')[-6:]  # 截取低 6 字节
-timestamp_hex = timestamp.hex()
+# 转换为16进制字符串
+hex_timestamp = timestamp_bytes.hex()
 
-# 打印结果以验证
-print("Timestamp (hex):", timestamp_hex)
+print(hex_timestamp)
