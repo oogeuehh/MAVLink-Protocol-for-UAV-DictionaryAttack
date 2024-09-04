@@ -1,15 +1,16 @@
 from datetime import datetime
-import struct
+import binascii
 
-# 获取当前UTC时间
-dt = datetime.utcnow()
-unix_timestamp = int(dt.timestamp())  # 获取秒数
-microseconds = dt.microsecond  # 获取微秒数
+# 输入的时间戳
+timestamp_str = '2024-09-03 16:43:46.505000'
 
-# 假设MAVLink时间戳使用4字节秒和4字节微秒
-timestamp_bytes = struct.pack('<II', unix_timestamp, microseconds)
+# 将时间戳字符串转换为 datetime 对象
+dt = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S.%f')
 
-# 转换为16进制字符串
-hex_timestamp = timestamp_bytes.hex()
+# 将 datetime 对象转换为 Unix 时间戳（秒数）
+unix_timestamp = int(dt.timestamp())
 
-print(hex_timestamp)
+# 将 Unix 时间戳转换为十六进制字符串
+hex_stream = binascii.hexlify(unix_timestamp.to_bytes(8, byteorder='big')).decode()
+
+print(hex_stream)
