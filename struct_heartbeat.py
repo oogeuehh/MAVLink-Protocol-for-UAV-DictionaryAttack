@@ -20,16 +20,20 @@ secreteKey = hashlib.sha256(seed.encode('utf-8')).hexdigest()
 linkid = input("Enter linkid (in hex format): ")
 
 
-# Heartbeat payload
-TYPE = 0x06
-AUTOPILOT = 0x08
-BASE_MODE = 0x00
-CUSTOM_MODE = struct.pack('4B', 0x00, 0x00, 0x00, 0x00)
-SYSTEM_STATUS = 0x00
-MAVLink_version = 0x03
+# MAVLink heartbeat payload fields (as per the MAVLink protocol)
+MAV_TYPE_GCS = 6  # This represents GCS type
+MAV_AUTOPILOT = 8
+BASE_MODE = 0
+CUSTOM_MODE = (0x00, 0x00, 0x00, 0x00)  # Custom mode is a 4-byte field
+SYSTEM_STATUS = 0
+MAVLINK_VERSION = 3
 
-# Use struct to pack payload
-payload = struct.pack('<BBB4sBB', TYPE, AUTOPILOT, BASE_MODE, CUSTOM_MODE, SYSTEM_STATUS, MAVLink_version)
+# Pack the heartbeat payload
+# <BBB4B2B -> 1 byte each for TYPE, AUTOPILOT, BASE_MODE, followed by 4 bytes for CUSTOM_MODE, then 1 byte for SYSTEM_STATUS and 1 byte for MAVLink version
+payload = struct.pack('<BBB4B2B', MAV_TYPE_GCS, MAV_AUTOPILOT, BASE_MODE, *CUSTOM_MODE, SYSTEM_STATUS, MAVLINK_VERSION)
+
+# Check the output to see if the payload is correct
+print(f"Packed payload (hex): {payload.hex()}")
 
 # Header fields
 STX = 0XFD
