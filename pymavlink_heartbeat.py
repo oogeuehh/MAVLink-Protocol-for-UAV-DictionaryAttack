@@ -1,8 +1,8 @@
 from pymavlink import mavutil
-import time
 import hashlib
-import struct
+import time
 
+master = mavutil.mavlink_connection('udpout:10.0.2.5:14551')
 def crc_accumulate(byte, crc):
     tmp = byte ^ (crc & 0xff)
     tmp ^= (tmp << 4) & 0xff
@@ -19,28 +19,14 @@ seed = input("Enter seed: ")
 secreteKey = hashlib.sha256(seed.encode('utf-8')).hexdigest()
 linkid = input("Enter linkid (in hex format): ")
 
-def build_message():
-    target_system = 1
-    target_component = 1
-    # 创建 MAVLink 消息
-    command = mavutil.mavlink.MAVLink_command_long_message(
-        target_system=target_system,
-        target_component=target_component,
-        command=mavutil.mavlink.MAV_CMD_DO_SET_MODE,
-        confirmation=0,
-        param1=1.0, param2=6.0, param3=0, 
-        param4=0, param5=0, param6=0, param7=0
-    )
-    return command
+command = mavutil.mavlink.MAVLink_heartbeat_message(
+    6,
+    8,
+    0,0,0,3)
 
-# 构建消息
-command_message = build_message()
+payload = command.get_msgbuf()
 
-# pack the message with only payload
-packed_message = command_message.pack(mavutil.mavlink.MAVLink('', 1))
-payload = packed_message[6:-2]  
-
-message_id = command_message.get_msgId()
+message_id = command.get_msgId()
 payload_length = len(payload)
 
 # 创建 MAVLink 2 消息头
@@ -49,7 +35,7 @@ header.extend(bytearray([0xFD]))  # STX (Start of Text)
 header.extend(payload_length.to_bytes(1, 'little'))  # Payload length
 header.extend(bytearray([1]))
 header.extend(bytearray([0])) 
-header.extend(bytearray([255]))  # Sequence number
+header.extend(bytearray([166]))  # Sequence number
 header.extend(bytearray([255])) 
 header.extend(bytearray([190])) 
 header.extend(message_id.to_bytes(3, 'little')) 
@@ -96,8 +82,6 @@ signed_msg = header + payload + bytes.fromhex(crc_hex) + bytes.fromhex(linkid) +
 
 # send message
 try:
-    master = mavutil.mavlink_connection('udpout:10.0.2.5:14551')
-    master.wait_heartbeat()
     master.write(signed_msg)
     print("message sent")
 except Exception as e:
