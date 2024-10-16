@@ -1,26 +1,34 @@
-import csv
-from collections import defaultdict
+import json
 
-# 初始化存储每个signature的字典
-signature_dict = defaultdict(int)
+# 假设你的Wireshark JSON文件路径为'mavlink_capture.json'
+json_file_path = 'mavlink_capture.json'
 
-# 假设CSV文件的结构中有一列名为'signature'
-csv_file_path = "mavlink_messages.csv"  # 替换为你的CSV文件路径
+# 打开并加载JSON文件
+with open(json_file_path, 'r') as file:
+    data = json.load(file)
 
-# 读取CSV文件并统计每个signature出现的次数
-with open(csv_file_path, mode='r') as file:
-    csv_reader = csv.DictReader(file)
-    for row in csv_reader:
-        signature = row['signature']  # 读取signature字段
-        signature_dict[signature] += 1
+# 存储所有的signature字段
+signatures = []
 
-# 检查是否有重复的signature
-duplicate_signatures = {sig: count for sig, count in signature_dict.items() if count > 1}
+# 遍历每个数据包
+for packet in data:
+    # Wireshark JSON文件结构通常包含'_source'字段，里面包含解析的层
+    layers = packet.get('_source', {}).get('layers', {})
+    
+    # 查找MAVLink协议的解析结果，假设signature在这个层中
+    mavlink_layer = layers.get('mavlink_proto', {})
+    
+    # 获取signature字段
+    signature = mavlink_layer.get('mavlink_proto.signature', None)
+    
+    # 如果signature存在，存储下来
+    if signature:
+        signatures.append(signature)
 
-# 输出重复的signature
-if duplicate_signatures:
-    print("发现重复的signature：")
-    for sig, count in duplicate_signatures.items():
-        print(f"Signature: {sig}, 出现次数: {count}")
+# 打印所有找到的signature字段
+if signatures:
+    print("找到的signatures:")
+    for sig in signatures:
+        print(sig)
 else:
-    print("没有发现重复的signature。")
+    print("没有找到signature字段")
